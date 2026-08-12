@@ -1,7 +1,7 @@
 // Generated with Claude
 
 // ============================================================
-//  Clauled - Claude usage monitor for ESP32-C3 + SH1106 OLED
+//  Clauled - Claude usage monitor for ESP32-C3 + SSD1306 OLED
 //
 //  Shows your Claude subscription usage (5h session + weekly)
 //  on a small OLED, read from the Anthropic API rate headers.
@@ -17,7 +17,7 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_SH110X.h>
+#include <Adafruit_SSD1306.h>
 #include <vector>
 #include <time.h>
 
@@ -31,7 +31,7 @@
 #define SCREEN_W   128
 #define SCREEN_H   64
 
-Adafruit_SH1106G display(SCREEN_W, SCREEN_H, &Wire, -1);
+Adafruit_SSD1306 display(SCREEN_W, SCREEN_H, &Wire, -1);
 WebServer server(80);
 
 // ============================================================
@@ -250,7 +250,7 @@ void buildPages() {
 // ── OLED rendering ────────────────────────────────────────────
 void oledStatus(const char* l1, const char* l2 = "", const char* l3 = "") {
   display.clearDisplay();
-  display.setTextColor(SH110X_WHITE);
+  display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
   display.setCursor(0, 8);  display.print(l1);
   display.setCursor(0, 26); display.print(l2);
@@ -260,7 +260,7 @@ void oledStatus(const char* l1, const char* l2 = "", const char* l3 = "") {
 
 void drawTextRow(int y, const String& label, const String& value) {
   display.setTextSize(1);
-  display.setTextColor(SH110X_WHITE);
+  display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, y);
   display.print(label.substring(0, 13));
   int16_t x1, y1; uint16_t w, h;
@@ -271,7 +271,7 @@ void drawTextRow(int y, const String& label, const String& value) {
 
 int drawBar(int y, const String& title, const String& valText, int p) {
   display.setTextSize(1);
-  display.setTextColor(SH110X_WHITE);
+  display.setTextColor(SSD1306_WHITE);
   int16_t x1, yy1; uint16_t tw, th;
 
   String pctStr = (p >= 0) ? String(p) + "%" : "--";
@@ -284,10 +284,10 @@ int drawBar(int y, const String& title, const String& valText, int p) {
   display.print(title.substring(0, maxChars));
   y += 10;
 
-  display.drawRect(0, y, 128, 6, SH110X_WHITE);
+  display.drawRect(0, y, 128, 6, SSD1306_WHITE);
   if (p >= 0) {
     int fillW = (int)(128L * p / 100);
-    if (fillW > 0) display.fillRect(0, y, fillW, 6, SH110X_WHITE);
+    if (fillW > 0) display.fillRect(0, y, fillW, 6, SSD1306_WHITE);
   }
   y += 8;
 
@@ -300,7 +300,7 @@ int drawBar(int y, const String& title, const String& valText, int p) {
 
 void drawHeader(int page, int total) {
   display.setTextSize(1);
-  display.setTextColor(SH110X_WHITE);
+  display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 0);
   display.print("Claude");
   if (total > 1) {
@@ -310,13 +310,13 @@ void drawHeader(int page, int total) {
     display.setCursor(128 - (int)w, 0);
     display.print(pg);
   }
-  display.drawLine(0, 9, 127, 9, SH110X_WHITE);
+  display.drawLine(0, 9, 127, 9, SSD1306_WHITE);
 }
 
 void drawFooter() {
-  display.drawLine(0, 54, 127, 54, SH110X_WHITE);
+  display.drawLine(0, 54, 127, 54, SSD1306_WHITE);
   display.setTextSize(1);
-  display.setTextColor(SH110X_WHITE);
+  display.setTextColor(SSD1306_WHITE);
 
   // Left: next poll countdown
   display.setCursor(0, 57);
@@ -621,7 +621,7 @@ void setup() {
   pinMode(BOOT_BTN, INPUT_PULLUP);
 
   Wire.begin(SDA_PIN, SCL_PIN);
-  if (!display.begin(OLED_ADDR, true)) {
+  if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
     Serial.println("[oled] not found");
     while (true) delay(100);
   }

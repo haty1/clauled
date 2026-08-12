@@ -9,7 +9,7 @@ The claude.ai usage page is fine, but you have to go look at it. I wanted a thin
 ## What you need
 
 - ESP32-C3 Mini (also sold as ESP32-C3 SuperMini)
-- SH1106 OLED, 128x64 pixels, I2C. These are the common ones with the blue and yellow split screen. Important: it needs to be the SH1106 controller, not the SSD1306. They look the same from the outside but need different drivers.
+- SSD1306 OLED, 128x64 pixels, I2C. These are the common ones with the blue and yellow split screen. Important: it needs to be the SSD1306 controller, not the SH1106. They look the same from the outside but need different drivers.
 - Four jumper wires
 - USB-C cable
 - A Claude subscription (Pro, Max, Team, or Enterprise)
@@ -160,7 +160,7 @@ Poll now fires an immediate API call and refreshes the usage display. Refresh re
 
 ## Troubleshooting
 
-**Garbage or noise on screen.** Almost always an SSD1306 module, not an SH1106. This firmware is written for the SH1106. If you are sure you have an SH1106 and still see noise, try lowering the I2C clock speed by changing `Wire.setClock(400000)` to `Wire.setClock(100000)` in `src/main.cpp`.
+**Garbage on screen, or everything shifted sideways by a couple of pixels.** Almost always an SH1106 module, not an SSD1306. This firmware is written for the SSD1306. If you are sure you have an SSD1306 and still see noise, try lowering the I2C clock speed by adding `Wire.setClock(100000);` after `Wire.begin(SDA_PIN, SCL_PIN);` in `src/main.cpp`.
 
 **Screen stays blank.** Flash an I2C scanner sketch and confirm the display responds at `0x3C`. Check VCC is on 3.3V and that SDA and SCL are not swapped.
 
